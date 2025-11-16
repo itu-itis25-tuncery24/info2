@@ -1055,7 +1055,8 @@ const SimulationModule = (() => {
   };
 
   const handleKeyboard = (event) => {
-    if (event.key === " " && document.activeElement.tagName !== "INPUT") {
+    const activeTag = document.activeElement.tagName;
+    if (event.key === " " && activeTag !== "INPUT" && activeTag !== "TEXTAREA") {
       event.preventDefault();
       isPlaying ? stopPlaying() : play();
     }
