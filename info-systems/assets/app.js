@@ -1055,17 +1055,20 @@ const SimulationModule = (() => {
   };
 
   const handleKeyboard = (event) => {
-    const activeTag = document.activeElement.tagName;
-    if (event.key === " " && activeTag !== "INPUT" && activeTag !== "TEXTAREA") {
+    const activeElement = document.activeElement;
+    const activeTag = activeElement.tagName;
+    const isEditable = activeTag === "INPUT" || activeTag === "TEXTAREA" || activeTag === "SELECT" || activeElement.isContentEditable;
+    
+    if (event.key === " " && !isEditable) {
       event.preventDefault();
       isPlaying ? stopPlaying() : play();
     }
-    if (event.key === "ArrowRight") {
+    if (event.key === "ArrowRight" && !isEditable) {
       event.preventDefault();
       stopPlaying();
       next();
     }
-    if (event.key === "ArrowLeft") {
+    if (event.key === "ArrowLeft" && !isEditable) {
       event.preventDefault();
       stopPlaying();
       prev();
