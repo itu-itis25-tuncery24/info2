@@ -1059,16 +1059,24 @@ const SimulationModule = (() => {
     const activeTag = activeElement.tagName;
     const isEditable = activeTag === "INPUT" || activeTag === "TEXTAREA" || activeTag === "SELECT" || activeElement.isContentEditable;
     
-    if (event.key === " " && !isEditable) {
+    // VVM kod editörünü özel olarak kontrol et
+    const isVVMEditor = activeElement.id === "vvm-code-editor";
+    
+    // Eğer editable bir alanda veya VVM editöründeyse, hiçbir şey yapma
+    if (isEditable || isVVMEditor) {
+      return; // preventDefault çağırma, olayın normal akmasını sağla
+    }
+    
+    if (event.key === " ") {
       event.preventDefault();
       isPlaying ? stopPlaying() : play();
     }
-    if (event.key === "ArrowRight" && !isEditable) {
+    if (event.key === "ArrowRight") {
       event.preventDefault();
       stopPlaying();
       next();
     }
-    if (event.key === "ArrowLeft" && !isEditable) {
+    if (event.key === "ArrowLeft") {
       event.preventDefault();
       stopPlaying();
       prev();
@@ -2543,12 +2551,6 @@ DAT 005    Limit value`
 
     // Initialize memory cells
     initializeMemoryCells();
-
-    // Prevent simulation keyboard shortcuts when typing in code editor
-    codeEditor.addEventListener("keydown", (event) => {
-      // Allow all keys to work normally in the editor
-      event.stopPropagation();
-    });
 
     // Update line numbers on input
     codeEditor.addEventListener("input", updateLineNumbers);
