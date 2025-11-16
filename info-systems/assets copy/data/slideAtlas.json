@@ -1,0 +1,260 @@
+[
+  {
+    "id": "introduction",
+    "title": "Introduction to Information Systems",
+    "range": "Slides 1-4",
+    "images": [
+      "assets/images/I2IS_01-Hardware-01.png",
+      "assets/images/I2IS_01-Hardware-02.png",
+      "assets/images/I2IS_01-Hardware-03.png",
+      "assets/images/I2IS_01-Hardware-04.png"
+    ],
+    "summary": "Course overview, instructor information and learning objectives outlining hardware-focused outcomes.",
+    "highlights": [
+      "Identify major hardware components and their roles.",
+      "Understand peripheral equipment and selection criteria.",
+      "Relate hardware to the broader information systems technology stack."
+    ]
+  },
+  {
+    "id": "computer-system-components",
+    "title": "Computer System Components",
+    "range": "Slides 5-12",
+    "images": [
+      "assets/images/I2IS_01-Hardware-05.png",
+      "assets/images/I2IS_01-Hardware-06.png",
+      "assets/images/I2IS_01-Hardware-07.png",
+      "assets/images/I2IS_01-Hardware-08.png",
+      "assets/images/I2IS_01-Hardware-09.png",
+      "assets/images/I2IS_01-Hardware-10.png",
+      "assets/images/I2IS_01-Hardware-11.png",
+      "assets/images/I2IS_01-Hardware-12.png"
+    ],
+    "summary": "Defines CPU, memory, I/O and system interconnection as the core hardware categories and introduces generational evolution.",
+    "highlights": [
+      "Hardware generations from vacuum tubes to massive parallelism.",
+      "Trend lines: higher performance, larger capacity, lower cost.",
+      "Von Neumann architecture as the sequential processing baseline."
+    ]
+  },
+  {
+    "id": "computer-generations",
+    "title": "Computer Hardware Generations",
+    "range": "Slides 13-22",
+    "images": [
+      "assets/images/I2IS_01-Hardware-13.png",
+      "assets/images/I2IS_01-Hardware-14.png",
+      "assets/images/I2IS_01-Hardware-15.png",
+      "assets/images/I2IS_01-Hardware-16.png",
+      "assets/images/I2IS_01-Hardware-17.png",
+      "assets/images/I2IS_01-Hardware-18.png",
+      "assets/images/I2IS_01-Hardware-19.png",
+      "assets/images/I2IS_01-Hardware-20.png",
+      "assets/images/I2IS_01-Hardware-21.png",
+      "assets/images/I2IS_01-Hardware-22.png"
+    ],
+    "summary": "Chronological comparison from 1st to 5th generation computers with standout systems like Cray-1, IBM Roadrunner and Frontier.",
+    "highlights": [
+      "Technologies progressed from vacuum tubes to GSI and exascale parallelism.",
+      "Representative specs for storage, cycle times and cost by era.",
+      "Supercomputers leverage parallel networks for teraflop to exaflop performance."
+    ]
+  },
+  {
+    "id": "computer-types",
+    "title": "Types of Computers",
+    "range": "Slides 23-36",
+    "images": [
+      "assets/images/I2IS_01-Hardware-23.png",
+      "assets/images/I2IS_01-Hardware-24.png",
+      "assets/images/I2IS_01-Hardware-25.png",
+      "assets/images/I2IS_01-Hardware-26.png",
+      "assets/images/I2IS_01-Hardware-27.png",
+      "assets/images/I2IS_01-Hardware-28.png",
+      "assets/images/I2IS_01-Hardware-29.png",
+      "assets/images/I2IS_01-Hardware-30.png",
+      "assets/images/I2IS_01-Hardware-31.png",
+      "assets/images/I2IS_01-Hardware-32.png",
+      "assets/images/I2IS_01-Hardware-33.png",
+      "assets/images/I2IS_01-Hardware-34.png",
+      "assets/images/I2IS_01-Hardware-35.png",
+      "assets/images/I2IS_01-Hardware-36.png"
+    ],
+    "summary": "Categorizes machines from supercomputers to wearable devices examining primary use cases and capabilities.",
+    "highlights": [
+      "Processing power correlates with application domain and scale.",
+      "Historical mini-computers like PDP series enabled departmental computing.",
+      "Mobile and wearable devices trade generality for specialization and portability."
+    ]
+  },
+  {
+    "id": "functional-vs-structural",
+    "title": "Functional vs Structural View",
+    "range": "Slides 37-41",
+    "images": [
+      "assets/images/I2IS_01-Hardware-37.png",
+      "assets/images/I2IS_01-Hardware-38.png",
+      "assets/images/I2IS_01-Hardware-39.png",
+      "assets/images/I2IS_01-Hardware-40.png",
+      "assets/images/I2IS_01-Hardware-41.png"
+    ],
+    "summary": "Maps data processing, storage, movement and control functions to CPU, memory, I/O and system buses.",
+    "highlights": [
+      "Nested structural diagrams highlight component interconnections.",
+      "Von Neumann block diagram reinforces shared memory concept.",
+      "Differentiates logical responsibilities from physical modules."
+    ]
+  },
+  {
+    "id": "program-execution",
+    "title": "Program Execution & Representation",
+    "range": "Slides 42-49",
+    "images": [
+      "assets/images/I2IS_01-Hardware-42.png",
+      "assets/images/I2IS_01-Hardware-43.png",
+      "assets/images/I2IS_01-Hardware-44.png",
+      "assets/images/I2IS_01-Hardware-45.png",
+      "assets/images/I2IS_01-Hardware-46.png",
+      "assets/images/I2IS_01-Hardware-47.png",
+      "assets/images/I2IS_01-Hardware-48.png",
+      "assets/images/I2IS_01-Hardware-49.png"
+    ],
+    "summary": "Explains compilation layers, program steps and the fetch–decode–execute cycle with diagrammatic support.",
+    "highlights": [
+      "High-level to machine code translation pipeline.",
+      "Hardware vs software programming flexibility.",
+      "Sequential instruction execution and performance metrics (MIPS)."
+    ]
+  },
+  {
+    "id": "cpu-architecture",
+    "title": "CPU Architecture & Registers",
+    "range": "Slides 50-57",
+    "images": [
+      "assets/images/I2IS_01-Hardware-50.png",
+      "assets/images/I2IS_01-Hardware-51.png",
+      "assets/images/I2IS_01-Hardware-52.png",
+      "assets/images/I2IS_01-Hardware-53.png",
+      "assets/images/I2IS_01-Hardware-54.png",
+      "assets/images/I2IS_01-Hardware-55.png",
+      "assets/images/I2IS_01-Hardware-56.png",
+      "assets/images/I2IS_01-Hardware-57.png"
+    ],
+    "summary": "Outlines CPU tasks, register roles and status word flags, with real-world register organization examples.",
+    "highlights": [
+      "Registers enable fast temporary storage and control flow.",
+      "Control/status registers manage execution context.",
+      "Program Status Word encodes arithmetic and control flags."
+    ]
+  },
+  {
+    "id": "memory-architecture",
+    "title": "Memory Architecture & Operations",
+    "range": "Slides 58-66",
+    "images": [
+      "assets/images/I2IS_01-Hardware-58.png",
+      "assets/images/I2IS_01-Hardware-59.png",
+      "assets/images/I2IS_01-Hardware-60.png",
+      "assets/images/I2IS_01-Hardware-61.png",
+      "assets/images/I2IS_01-Hardware-62.png",
+      "assets/images/I2IS_01-Hardware-63.png",
+      "assets/images/I2IS_01-Hardware-64.png",
+      "assets/images/I2IS_01-Hardware-65.png",
+      "assets/images/I2IS_01-Hardware-66.png"
+    ],
+    "summary": "Shows MAR/MDR interactions, memory hierarchy concepts, cache positioning and virtual memory fundamentals.",
+    "highlights": [
+      "Address decoding directs read/write operations.",
+      "Hierarchy balances cost, capacity and latency.",
+      "Cache vs virtual memory roles in performance and capacity."
+    ]
+  },
+  {
+    "id": "memory-types",
+    "title": "Memory Technologies",
+    "range": "Slides 67-70",
+    "images": [
+      "assets/images/I2IS_01-Hardware-67.png",
+      "assets/images/I2IS_01-Hardware-68.png",
+      "assets/images/I2IS_01-Hardware-69.png",
+      "assets/images/I2IS_01-Hardware-70.png"
+    ],
+    "summary": "Compares volatile and non-volatile memories including DRAM, SRAM, ROM families and external storage media.",
+    "highlights": [
+      "DRAM vs SRAM trade-offs in speed and cost.",
+      "ROM variants from PROM to Flash.",
+      "External storage media classifications (SSD, magnetic, optical, tape)."
+    ]
+  },
+  {
+    "id": "io-architecture",
+    "title": "Input/Output Architecture",
+    "range": "Slides 71-76",
+    "images": [
+      "assets/images/I2IS_01-Hardware-71.png",
+      "assets/images/I2IS_01-Hardware-72.png",
+      "assets/images/I2IS_01-Hardware-73.png",
+      "assets/images/I2IS_01-Hardware-74.png",
+      "assets/images/I2IS_01-Hardware-75.png",
+      "assets/images/I2IS_01-Hardware-76.png"
+    ],
+    "summary": "Describes I/O modules, device interfacing challenges, standard communication steps and I/O control strategies.",
+    "highlights": [
+      "I/O modules manage control, data buffering and error handling.",
+      "Programmed, interrupt-driven, DMA and channel I/O models.",
+      "Balancing device heterogeneity with CPU/Memory speeds."
+    ]
+  },
+  {
+    "id": "io-examples",
+    "title": "Input/Output Device Examples",
+    "range": "Slides 77-79",
+    "images": [
+      "assets/images/I2IS_01-Hardware-77.png",
+      "assets/images/I2IS_01-Hardware-78.png",
+      "assets/images/I2IS_01-Hardware-79.png"
+    ],
+    "summary": "Catalogs representative input and output peripherals grouped by interaction mode and data format.",
+    "highlights": [
+      "Human-readable vs machine-readable devices.",
+      "Transaction-specific peripherals like POS terminals.",
+      "Visualization and audio output devices."
+    ]
+  },
+  {
+    "id": "bus-architecture",
+    "title": "Bus Architecture & Characteristics",
+    "range": "Slides 80-86",
+    "images": [
+      "assets/images/I2IS_01-Hardware-80.png",
+      "assets/images/I2IS_01-Hardware-81.png",
+      "assets/images/I2IS_01-Hardware-82.png",
+      "assets/images/I2IS_01-Hardware-83.png",
+      "assets/images/I2IS_01-Hardware-84.png",
+      "assets/images/I2IS_01-Hardware-85.png",
+      "assets/images/I2IS_01-Hardware-86.png"
+    ],
+    "summary": "Explains system bus responsibilities, signal types, physical realizations and topologies (point-to-point vs multipoint).",
+    "highlights": [
+      "Data, address, control (and optional power) lines.",
+      "Protocol and throughput dictate compatibility.",
+      "Broadcast vs dedicated channel architectures."
+    ]
+  },
+  {
+    "id": "motherboard",
+    "title": "Motherboard & Chipset Layouts",
+    "range": "Slides 87-88",
+    "images": [
+      "assets/images/I2IS_01-Hardware-87.png",
+      "assets/images/I2IS_01-Hardware-88.png"
+    ],
+    "summary": "Annotated motherboard diagrams highlighting component placement and chipset interconnects.",
+    "highlights": [
+      "Key connectors: CPU socket, DIMM slots, PCI/PCIe lanes, power delivery.",
+      "Northbridge/Southbridge responsibilities in legacy architectures.",
+      "Physical backplane as the embodiment of the system bus."
+    ]
+  }
+]
+

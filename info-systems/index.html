@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bilgisayar Sistemleri Atlası</title>
+    <link rel="stylesheet" href="assets/styles.css" />
+    <script defer src="assets/app.js"></script>
+  </head>
+  <body>
+    <!--
+      Bilgisayar Sistemleri Atlası
+      Özellikler:
+      - Von Neumann mimarisi SVG diyagramı, bileşenleri üzerine tıklayınca bilgi paneli güncellenir.
+      - Fetch → Decode → Execute → Write-back simülasyonu, animasyon kontrolleri ve senaryo seçimi.
+      - Light / dark tema, klavye erişilebilirliği, tooltipler ve yönlendirmeli onboarding.
+      - Donanım katmanları için akordeon içerik, donanım nesilleri zaman çizelgesi ve döngüsel mikro bilgiler.
+    -->
+    <div class="bg-noise" aria-hidden="true"></div>
+
+    <header class="hero" id="top">
+      <div class="hero-inner">
+        <div class="hero-copy">
+          <span class="eyebrow">Etkileşimli Simülasyon</span>
+          <h1>Von Neumann Mimarisi Nasıl Çalışır?</h1>
+          <p>
+            Bileşenleri keşfet, veri yollarını takip et ve bir talimatın nasıl işlendiğini adım adım izle.
+            Bu deneyim, bilgisayar sistemlerinin kalbini görselleştirmen için tasarlandı.
+          </p>
+          <div class="hero-actions">
+            <button class="cta" data-scroll-target="#simulation">
+              Başlat Simülasyonu
+            </button>
+            <button class="ghost" data-scroll-target="#layers">
+              Bilgi Katmanlarını Gör
+            </button>
+          </div>
+        </div>
+        <button id="theme-toggle" class="theme-toggle" aria-label="Tema değiştir">
+          🌙
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section id="simulation" class="section simulation">
+        <header class="section-header">
+          <div>
+            <h2>Canlı Veri Akışı Simülasyonu</h2>
+            <p>
+              Fetch &rarr; Decode &rarr; Execute &rarr; Write-back döngüsünü incele.
+              Senaryolar arasında geçiş yap, animasyon hızını ayarla ve veri akışını an be an takip et.
+            </p>
+          </div>
+          <div class="status-pill">
+            <span class="dot pulse"></span>
+            <span>Simülasyon hazır</span>
+          </div>
+        </header>
+
+        <div class="control-bar" role="group" aria-label="Simülasyon kontrolleri">
+          <div class="control-row primary">
+            <button id="sim-play" class="control-btn" aria-label="Başlat">
+              ▶
+            </button>
+            <button id="sim-pause" class="control-btn" aria-label="Duraklat">
+              ❚❚
+            </button>
+            <button id="sim-step-forward" class="control-btn" aria-label="İleri adım">
+              ↦
+            </button>
+            <button id="sim-step-back" class="control-btn" aria-label="Geri adım">
+              ↤
+            </button>
+            <button id="sim-reset" class="control-btn" aria-label="Sıfırla">
+              ⟲
+            </button>
+          </div>
+          <div class="control-row secondary">
+            <label>
+              Hız
+              <input
+                id="sim-speed"
+                type="range"
+                min="0.5"
+                max="2"
+                step="0.25"
+                value="1"
+                aria-valuetext="1x hız"
+              />
+            </label>
+            <label>
+              Senaryo
+              <select id="scenario-select" class="scenario-select">
+                <option value="load">LOAD (Bellekten okuma)</option>
+                <option value="add">ADD (ALU işlemi)</option>
+                <option value="store">STORE (Belleğe yazma)</option>
+              </select>
+            </label>
+            <div class="scenario-info" id="scenario-info">
+              <div class="scenario-text">
+                <strong id="scenario-name">LOAD</strong>
+                <p id="scenario-description">Bellekten veri okuma işlemi.</p>
+              </div>
+            </div>
+            <div class="lcd">
+              <span>Çevrim</span>
+              <strong id="clock-cycle">0001</strong>
+            </div>
+            <div class="lcd">
+              <span>Talimat</span>
+              <strong id="instruction-counter">01</strong>
+            </div>
+            <div class="state-indicator" aria-live="polite">
+              <span class="badge" id="state-indicator">Idle</span>
+              <span class="sub">Durum makinesi</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="legend-panel" role="list">
+          <span role="listitem"><i class="legend-dot register"></i> CPU</span>
+          <span role="listitem"><i class="legend-dot memory-active"></i> Bellek</span>
+          <span role="listitem"><i class="legend-dot io"></i> G/Ç</span>
+          <span role="listitem"><i class="legend-dot bus-system"></i> Veri Yolu</span>
+          <span role="listitem"><i class="legend-dot address"></i> Adres Yolu</span>
+          <span role="listitem"><i class="legend-dot bus-control"></i> Kontrol Sinyali</span>
+        </div>
+
+        <div class="simulation-layout">
+          <figure
+            class="diagram-canvas"
+            aria-describedby="diagram-caption"
+            role="presentation"
+          >
+            <svg
+              id="architecture-diagram"
+              viewBox="0 0 1100 620"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-labelledby="diagram-title"
+            >
+              <title id="diagram-title">Von Neumann Mimarisi Diyagramı</title>
+              <defs>
+                <linearGradient id="bus-glow" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" />
+                  <stop offset="50%" />
+                  <stop offset="100%" />
+                </linearGradient>
+                <filter id="soft-shadow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="10" stdDeviation="14" flood-opacity="0.2" />
+                </filter>
+              </defs>
+
+              <!-- System Buses (drawn first, so they appear behind nodes) -->
+              <g class="bus-layer">
+                <!-- System Bus Label -->
+                <text x="540" y="310" class="bus-label">System Bus</text>
+                
+                <!-- Main horizontal bus connecting CPU to Memory (bidirectional) -->
+                <path
+                  class="bus-line bus-line--data"
+                  data-link="data-bus"
+                  d="M400 315 H 700"
+                ></path>
+                <path
+                  class="bus-line bus-line--address"
+                  data-link="address-bus"
+                  d="M400 335 H 700"
+                ></path>
+                <path
+                  class="bus-line bus-line--control"
+                  data-link="control-bus"
+                  d="M400 355 H 700"
+                ></path>
+                
+                <!-- I/O to System Bus connections -->
+                <path
+                  class="bus-line bus-line--io"
+                  data-link="io-link"
+                  d="M380 490 H 430"
+                ></path>
+                <path
+                  class="bus-line bus-line--io"
+                  data-link="io-bus"
+                  d="M540 440 V 355"
+                ></path>
+                
+                <!-- Internal CPU Connections (Bus-like) -->
+                <!-- Registers to ALU -->
+                <path class="bus-line bus-line--internal" data-link="reg-to-alu-1" d="M180 240 L180 350"></path>
+                <path class="bus-line bus-line--internal" data-link="reg-to-alu-2" d="M300 240 L220 350"></path>
+                
+                <!-- ALU to Control Unit (bidirectional) -->
+                <path class="bus-line bus-line--internal" data-link="alu-to-control" d="M240 390 L260 390"></path>
+                
+                <!-- Control to Registers (upward control signal from Registers to Control Unit) -->
+                <path class="bus-line bus-line--control" data-link="control-to-reg" d="M310 315 L310 360"></path>
+              </g>
+
+              <!-- CPU Housing -->
+              <g class="node node--cpu" data-node="cpu" tabindex="0">
+                <rect x="80" y="100" width="320" height="440" rx="8" ry="8" class="cpu-border"></rect>
+                <text x="240" y="135" class="node-title">Central Processing Unit</text>
+
+                <!-- Register Bank Container -->
+                <rect x="110" y="155" width="260" height="160" rx="16" ry="16" class="register-bank-border"></rect>
+                <text x="240" y="175" class="bank-label">Registers</text>
+
+                <!-- Registers - Row 1 -->
+                <g class="sub-node register-node" data-node="pc" tabindex="0">
+                  <rect x="130" y="190" width="100" height="50" rx="25" ry="25" class="register-shape"></rect>
+                  <text x="180" y="220" class="register-text">Program Counter</text>
+                </g>
+                <g class="sub-node register-node" data-node="mar" tabindex="0">
+                  <rect x="250" y="190" width="100" height="50" rx="25" ry="25" class="register-shape"></rect>
+                  <text x="300" y="220" class="register-text">MAR</text>
+                </g>
+
+                <!-- Registers - Row 2 -->
+                <g class="sub-node register-node" data-node="ir" tabindex="0">
+                  <rect x="130" y="250" width="100" height="50" rx="25" ry="25" class="register-shape"></rect>
+                  <text x="180" y="280" class="register-text">IR</text>
+                </g>
+                <g class="sub-node register-node" data-node="mbr" tabindex="0">
+                  <rect x="250" y="250" width="100" height="50" rx="25" ry="25" class="register-shape"></rect>
+                  <text x="300" y="280" class="register-text">MBR</text>
+                </g>
+
+                <!-- ALU - Trapezoid Shape (like in the images) -->
+                <g class="sub-node" data-node="alu" tabindex="0">
+                  <path
+                    d="M130 350 L210 350 L240 430 L100 430 Z"
+                    class="alu-shape"
+                  ></path>
+                  <text x="170" y="385" class="alu-text">Arithmetic-Logic</text>
+                  <text x="170" y="405" class="alu-text">Unit</text>
+                </g>
+
+                <!-- Control Unit - Yellow rounded box -->
+                <g class="sub-node" data-node="control-unit" tabindex="0">
+                  <rect x="260" y="360" width="100" height="60" rx="12" ry="12" class="control-unit-shape"></rect>
+                  <text x="310" y="390" class="control-text">Control</text>
+                  <text x="310" y="405" class="control-text">Unit</text>
+                </g>
+              </g>
+
+              <!-- Main Memory -->
+              <g class="node node--memory" data-node="memory" tabindex="0">
+                <rect x="700" y="100" width="280" height="440" rx="8" ry="8" class="memory-border"></rect>
+                <text x="840" y="135" class="node-title">Main Memory</text>
+
+                <!-- Address Labels -->
+                <text x="720" y="175" class="memory-address-label">0</text>
+                <text x="720" y="215" class="memory-address-label">1</text>
+                <text x="720" y="255" class="memory-address-label">2</text>
+
+                <!-- Instruction Bank -->
+                <g class="memory-bank" data-node="instruction-bank" tabindex="0">
+                  <text x="840" y="195" class="bank-title">Instruction</text>
+                  <rect x="750" y="180" width="160" height="32" rx="4" class="memory-cell"></rect>
+                  <rect x="750" y="220" width="160" height="32" rx="4" class="memory-cell"></rect>
+                  <rect x="750" y="260" width="160" height="32" rx="4" class="memory-cell"></rect>
+                </g>
+
+                <!-- Separator dot -->
+                <text x="840" y="320" class="memory-separator">⋮</text>
+
+                <!-- Data Bank -->
+                <g class="memory-bank" data-node="data-bank" tabindex="0">
+                  <text x="840" y="365" class="bank-title">Data</text>
+                  <rect x="750" y="375" width="160" height="32" rx="4" class="memory-cell"></rect>
+                  <rect x="750" y="415" width="160" height="32" rx="4" class="memory-cell"></rect>
+                  <rect x="750" y="455" width="160" height="32" rx="4" class="memory-cell"></rect>
+                </g>
+
+                <!-- Address Labels (bottom) -->
+                <text x="720" y="495" class="memory-address-label">n - 2</text>
+                <text x="720" y="515" class="memory-address-label">n - 1</text>
+              </g>
+
+              <!-- IO Module -->
+              <g class="node node--io" data-node="io-module" tabindex="0">
+                <rect x="430" y="440" width="220" height="100" rx="8" ry="8" class="io-border"></rect>
+                <text x="540" y="470" class="node-title">Input/Output System</text>
+                <g class="sub-node" data-node="io-buffer" tabindex="0">
+                  <rect x="460" y="485" width="160" height="40" rx="8" class="io-buffer-shape"></rect>
+                  <text x="540" y="510" class="io-text">Buffers</text>
+                </g>
+              </g>
+
+              <!-- Data Flow Particles -->
+              <g id="flow-layer"></g>
+            </svg>
+            <figcaption id="diagram-caption">
+              Diyagramdaki her bileşen tıklanabilir. Veri yolları animasyon sırasında renklenecek.
+            </figcaption>
+            <div id="diagram-tooltip" class="diagram-tooltip" role="tooltip" hidden></div>
+          </figure>
+
+          <!-- Execution Trace Table -->
+          <div class="execution-trace">
+            <div class="trace-header">
+              <h4>📊 Execution Trace</h4>
+              <p>Her adımda bellek ve register değişimlerini takip edin</p>
+            </div>
+            <div class="trace-container">
+              <div class="trace-step" id="trace-step-1">
+                <div class="trace-step-label">Step 1</div>
+                <div class="trace-content">
+                  <div class="trace-column trace-memory">
+                    <div class="trace-column-header">Memory</div>
+                    <table class="trace-table">
+                      <tbody id="trace-memory-1"></tbody>
+                    </table>
+                  </div>
+                  <div class="trace-column trace-registers">
+                    <div class="trace-column-header">CPU Registers</div>
+                    <table class="trace-table">
+                      <tbody id="trace-registers-1"></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <aside class="info-panel" id="info-panel" aria-live="polite">
+            <header class="info-header">
+              <span class="badge badge--ghost" id="info-category">Bileşen</span>
+              <h3 id="info-title">Bir bileşen seç</h3>
+              <p id="info-subtitle">
+                Diyagramda bir noktayı vurgula veya sağdaki simülasyon adımlarından birini başlat.
+              </p>
+            </header>
+            <div class="info-body" id="info-body">
+              <p>
+                Simülasyon sırasında veri yolları yanıp sönecek ve ilgili bileşen burada detaylı
+                olarak açıklanacak. Kontrol çubuğundan adım adım ilerleyebilirsin.
+              </p>
+            </div>
+            <div class="info-metrics">
+              <dl>
+                <div>
+                  <dt>Aktif veri yolu</dt>
+                  <dd id="info-active-bus">—</dd>
+                </div>
+                <div>
+                  <dt>Kaynak</dt>
+                  <dd id="info-source">—</dd>
+                </div>
+                <div>
+                  <dt>Hedef</dt>
+                  <dd id="info-target">—</dd>
+                </div>
+              </dl>
+            </div>
+            <div class="info-flow-detail" id="info-flow-detail">
+              <h4 class="flow-detail-title">🔍 Adım Adım Veri Akışı</h4>
+              <ol class="flow-steps" id="flow-steps">
+                <li>Simülasyon başladığında bu bölümde detaylı akış görünecek.</li>
+              </ol>
+            </div>
+            <div class="info-actions">
+              <button id="play-focus" class="cta cta--ghost">
+                Bu bileşenin akışını izle
+              </button>
+            </div>
+          </aside>
+        </div>
+
+        <div class="step-track">
+          <div class="step-track-header">
+            <h3>Talimat Adımları</h3>
+            <span id="step-progress-label" class="step-count">Adım 1 / 4</span>
+          </div>
+          <div class="step-progress" aria-hidden="true">
+            <div id="step-progress-bar" class="step-progress-bar"></div>
+          </div>
+          <ol
+            id="step-list"
+            class="step-list"
+            role="listbox"
+            aria-label="Simülasyon adımları"
+          ></ol>
+          <p id="step-narration" class="step-narration">
+            Seçilen adımın açıklaması burada görünecek.
+          </p>
+        </div>
+
+        <div class="diagram-reference">
+          <div class="diagram-reference-header">
+            <h3>Referans Şemaları</h3>
+            <p>
+              Von Neumann veri akışını farklı açılardan görselleştiren iki yardımcı şema arasında geçiş yap.
+              Bu görseller, simülasyon diyagramındaki bileşenlerle birebir eşleşir.
+            </p>
+          </div>
+          <div class="diagram-reference-controls" role="tablist" aria-label="Referans diyagramları">
+            <button
+              type="button"
+              class="reference-tab is-active"
+              data-reference="classic"
+              role="tab"
+              aria-selected="true"
+            >
+              Basitleştirilmiş CPU Şeması
+            </button>
+            <button
+              type="button"
+              class="reference-tab"
+              data-reference="course"
+              role="tab"
+              aria-selected="false"
+            >
+              Ders Diyagramı
+            </button>
+          </div>
+          <div class="diagram-reference-viewport">
+            <img
+              id="reference-image"
+              src="assets/images/I2IS_01-Hardware-41.png"
+              alt="CPU, bellek ve I/O etkileşimini gösteren basitleştirilmiş blok diyagramı"
+            />
+          </div>
+          <div class="diagram-reference-footer">
+            <p id="reference-caption">
+              Program sayacı, kayıtlar, ALU ve kontrol biriminden oluşan CPU; bellek ve I/O sistemiyle etkileşiyor.
+            </p>
+            <a
+              id="reference-open"
+              class="ghost"
+              href="assets/images/I2IS_01-Hardware-41.png"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Tam boy görseli aç
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section id="layers" class="section layers">
+        <header class="section-header">
+          <h2>Bilgi Katmanlarını Yakından İncele</h2>
+          <p>
+            Donanım bileşenlerinin mikro mimarisini, veri yolu yoğunluğunu ve tarihsel gelişimi
+            katmanlı olarak incele.
+          </p>
+        </header>
+        <div class="accordion" id="layer-accordion">
+          <article class="accordion-item" data-layer="components">
+            <button class="accordion-trigger">
+              <span>Bileşen Detayları</span>
+              <span class="icon">▾</span>
+            </button>
+            <div class="accordion-panel">
+              <div class="component-grid" id="component-grid"></div>
+            </div>
+          </article>
+          <article class="accordion-item" data-layer="bus-tracker">
+            <button class="accordion-trigger">
+              <span>Veri Yolu İzleyicisi</span>
+              <span class="icon">▾</span>
+            </button>
+            <div class="accordion-panel">
+              <canvas id="bus-heatmap" width="900" height="240" aria-label="Veri yolu ısı haritası"></canvas>
+              <p class="panel-note">
+                Her satır belirli bir veri yolunu, her sütun ise saat çevrimini temsil eder. Renk yoğunluğu, kullanım sıklığını gösterir.
+              </p>
+            </div>
+          </article>
+          <article class="accordion-item" data-layer="micro-architecture">
+            <button class="accordion-trigger">
+              <span>Mikro Mimari Perspektif</span>
+              <span class="icon">▾</span>
+            </button>
+            <div class="accordion-panel">
+              <div class="micro-zoom">
+                <div class="micro-layer control">
+                  <h3>Kontrol Ünitesi</h3>
+                  <p>Sequencing logic, register ve decoder katmanlarını içeren iç yapı.</p>
+                </div>
+                <div class="micro-layer alu">
+                  <h3>ALU</h3>
+                  <p>Aritmetik ve mantıksal işlemler için taşıma/borç takipli pipeline diyagramı.</p>
+                </div>
+                <div class="micro-layer interconnect">
+                  <h3>Sistemler Arası Bağlantı</h3>
+                  <p>CPU, bellek ve G/Ç arasında hibrit topoloji. Yüksek bant genişliği için paralel veri yolları.</p>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- VVM Simulator Section -->
+      <section id="vvm-simulator" class="section vvm-simulator">
+        <header class="section-header">
+          <div>
+            <h2>Von Neumann Sanal Makinesi (VVM)</h2>
+            <p>
+              Kendi assembly programınızı yazın ve Von Neumann mimarisinin nasıl çalıştığını adım adım izleyin.
+              Gerçek bir işlemci gibi, her talimat fetch-decode-execute döngüsünden geçer.
+            </p>
+          </div>
+        </header>
+
+        <div class="vvm-container">
+          <!-- Left Panel: Code Editor & Controls -->
+          <div class="vvm-left-panel">
+            <div class="vvm-examples">
+              <label for="vvm-example-select">Örnek Programlar</label>
+              <select id="vvm-example-select" class="vvm-select">
+                <option value="">-- Bir örnek seçin --</option>
+                <option value="sum">Toplama (İki Sayı)</option>
+                <option value="fibonacci">Fibonacci Dizisi</option>
+                <option value="max">Maksimum Değer Bulma</option>
+                <option value="loop">Döngü Örneği</option>
+              </select>
+            </div>
+
+            <div class="vvm-editor-container">
+              <div class="vvm-editor-header">
+                <span>Assembly Kodu</span>
+                <button id="vvm-clear-btn" class="vvm-btn-small" title="Kodu temizle">Temizle</button>
+              </div>
+              <div class="vvm-editor-wrapper">
+                <div class="vvm-line-numbers" id="vvm-line-numbers" aria-hidden="true"></div>
+                <textarea 
+                  id="vvm-code-editor" 
+                  class="vvm-code-editor" 
+                  placeholder="; Assembly kodunuzu buraya yazın&#x0a;; Örnek:&#x0a;LOAD 10&#x0a;ADD 11&#x0a;STORE 12&#x0a;HALT"
+                  spellcheck="false"
+                  aria-label="Assembly kod editörü"
+                ></textarea>
+              </div>
+              <div class="vvm-editor-info">
+                <span id="vvm-line-count">1 satır</span>
+                <span id="vvm-status-text">Hazır</span>
+              </div>
+            </div>
+
+            <div class="vvm-controls">
+              <button id="vvm-run-btn" class="vvm-btn vvm-btn-primary" title="Programı çalıştır">
+                ▶ Çalıştır
+              </button>
+              <button id="vvm-step-btn" class="vvm-btn vvm-btn-secondary" title="Bir adım ilerle">
+                ⏭ Adım
+              </button>
+              <button id="vvm-reset-btn" class="vvm-btn vvm-btn-secondary" title="Simülatörü sıfırla">
+                ⟲ Sıfırla
+              </button>
+              <div class="vvm-speed-control">
+                <label for="vvm-speed-slider">Hız</label>
+                <input 
+                  type="range" 
+                  id="vvm-speed-slider" 
+                  class="vvm-slider" 
+                  min="0.5" 
+                  max="3" 
+                  step="0.5" 
+                  value="1"
+                  aria-label="Çalıştırma hızı"
+                />
+                <span id="vvm-speed-label">1x</span>
+              </div>
+            </div>
+
+            <div class="vvm-help-box">
+              <h4>VVM Komutları (Little Man Computer)</h4>
+              <ul class="vvm-instruction-list">
+                <li><code>LDA nn</code> (5nn) - Bellek[nn] → AC</li>
+                <li><code>STO nn</code> (3nn) - AC → Bellek[nn]</li>
+                <li><code>ADD nn</code> (1nn) - AC + Bellek[nn] → AC</li>
+                <li><code>SUB nn</code> (2nn) - AC - Bellek[nn] → AC</li>
+                <li><code>IN</code> (901) - Kullanıcıdan girdi → AC</li>
+                <li><code>OUT</code> (902) - AC'yi çıktıla</li>
+                <li><code>BR nn</code> (6nn) - nn adresine atla</li>
+                <li><code>BRZ nn</code> (7nn) - AC=0 ise nn'e atla</li>
+                <li><code>BRP nn</code> (8nn) - AC>=0 ise nn'e atla</li>
+                <li><code>NOP</code> (4nn) - Boş işlem</li>
+                <li><code>HLT</code> (000) - Programı durdur</li>
+                <li><code>DAT nnn</code> - Veri (örn: DAT -001)</li>
+                <li><code>*nn</code> - Adres yönergesi</li>
+                <li><code>// yorum</code> - Yorum satırı</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Right Panel: Registers, Memory, Output -->
+          <div class="vvm-right-panel">
+            <!-- Registers -->
+            <div class="vvm-panel vvm-registers-panel">
+              <h3>CPU Kayıtları</h3>
+              <div class="vvm-registers-grid">
+                <div class="vvm-register" data-reg="pc">
+                  <label>PC</label>
+                  <span class="vvm-register-value" id="vvm-reg-pc">00</span>
+                </div>
+                <div class="vvm-register" data-reg="ir">
+                  <label>IR</label>
+                  <span class="vvm-register-value" id="vvm-reg-ir">000</span>
+                </div>
+                <div class="vvm-register" data-reg="ac">
+                  <label>AC</label>
+                  <span class="vvm-register-value" id="vvm-reg-ac">+000</span>
+                </div>
+                <div class="vvm-register" data-reg="mar">
+                  <label>MAR</label>
+                  <span class="vvm-register-value" id="vvm-reg-mar">00</span>
+                </div>
+                <div class="vvm-register" data-reg="mbr">
+                  <label>MBR</label>
+                  <span class="vvm-register-value" id="vvm-reg-mbr">+000</span>
+                </div>
+                <div class="vvm-register vvm-register-flags" data-reg="flags">
+                  <label>Flags</label>
+                  <span class="vvm-register-value" id="vvm-reg-flags">
+                    <span class="flag" data-flag="z">Z</span>
+                    <span class="flag" data-flag="n">N</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Memory -->
+            <div class="vvm-panel vvm-memory-panel">
+              <h3>Bellek (0-15)</h3>
+              <div class="vvm-memory-grid" id="vvm-memory-grid">
+                <!-- Memory cells will be generated by JS -->
+              </div>
+            </div>
+
+            <!-- Output Console -->
+            <div class="vvm-panel vvm-output-panel">
+              <div class="vvm-output-header">
+                <h3>Çıktı</h3>
+                <button id="vvm-clear-output-btn" class="vvm-btn-small" title="Çıktıyı temizle">Temizle</button>
+              </div>
+              <div class="vvm-output-console" id="vvm-output-console">
+                <div class="vvm-output-line vvm-output-info">VVM Hazır. Programınızı çalıştırın.</div>
+              </div>
+            </div>
+
+            <!-- Status Bar -->
+            <div class="vvm-status-bar">
+              <span class="vvm-status-indicator" id="vvm-status-indicator">
+                <span class="status-dot status-ready"></span>
+                <span id="vvm-status-label">Hazır</span>
+              </span>
+              <span id="vvm-cycle-count">Çevrim: 0</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="timeline" class="section timeline">
+        <header class="section-header">
+          <h2>Donanım Nesilleri Zaman Çizelgesi</h2>
+          <p>
+            Kaydırıcıyı hareket ettirerek bilgisayar donanımının evrimini incele. Her nesil için
+            kullanılan teknoloji, örnek sistemler ve performans değerleri güncellenecek.
+          </p>
+        </header>
+        <div class="timeline-wrapper">
+          <label class="visually-hidden" for="generation-slider">Donanım nesil seçici</label>
+          <input
+            id="generation-slider"
+            type="range"
+            min="0"
+            max="4"
+            value="0"
+            step="1"
+            aria-valuetext="Birinci nesil"
+          />
+          <div class="timeline-content">
+            <div class="timeline-card">
+              <span class="badge badge--ghost" id="generation-era">1. Nesil</span>
+              <h3 id="generation-title">Vakum Tüpleri Çağı</h3>
+              <p id="generation-description">
+                1940'ların sonu: Elektronik bilgisayarların doğuşu, vakum tüplerinin parlak ama ısınan dünyası.
+              </p>
+              <ul id="generation-highlights"></ul>
+            </div>
+            <div class="timeline-visual" id="generation-visual" role="img" aria-label="Nesil görselleştirmesi"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="microfacts" class="section microfacts">
+        <header class="section-header">
+          <h2>Did You Know?</h2>
+          <p>Her 15 saniyede bir yeni bir bilgi kartı görünecek.</p>
+        </header>
+        <div class="microfact-carousel" aria-live="polite">
+          <article class="microfact-card" id="microfact-card">
+            <h3 id="microfact-title">Hazırlanıyor…</h3>
+            <p id="microfact-text">Simülasyon hazırlandığında bilgiler burada dönecek.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="slide-atlas" class="section slide-atlas">
+        <header class="section-header">
+          <div>
+            <h2>Görsel Atlas</h2>
+            <p>
+              Sunumdaki 88 slaytı konu başlıklarına göre gruplayarak hızlıca inceleyebilirsin.
+              Bir başlığa tıklayarak özetini, öne çıkan noktaları ve örnek görselleri keşfet.
+            </p>
+          </div>
+          <button id="slide-expand" class="ghost" data-scroll-target="#slide-atlas">
+            Tüm başlıkları görüntüle
+          </button>
+        </header>
+        <div class="slide-atlas-layout">
+          <aside class="slide-atlas-menu" aria-label="Slayt kategorileri">
+            <ul id="slide-atlas-list"></ul>
+          </aside>
+          <div class="slide-atlas-detail" aria-live="polite">
+            <div class="slide-atlas-preview">
+              <img id="slide-atlas-image" src="" alt="Seçilen slayt görsel önizlemesi" hidden />
+              <span id="slide-placeholder">Bir başlık seçerek görsel önizlemesini gör.</span>
+            </div>
+            <div class="slide-atlas-meta">
+              <span class="badge badge--ghost" id="slide-atlas-range">Slides 1-4</span>
+              <h3 id="slide-atlas-title">Bir başlık seç</h3>
+              <p id="slide-atlas-summary">
+                Slayt özetleri burada yer alacak. Sol taraftan bir kategori seçerek başlayabilirsin.
+              </p>
+              <ul id="slide-atlas-highlights" class="slide-highlights"></ul>
+              <div class="slide-atlas-actions">
+                <a id="slide-atlas-open" class="cta" href="#" target="_blank" rel="noopener noreferrer" hidden>
+                  Görseli aç
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div>
+        <strong>Kaynaklar</strong>
+        <ul>
+          <li>Prof. Nizamettin Aydın (İTÜ) - Introduction to Information Systems</li>
+          <li>Computer Organization &amp; Design, Patterson &amp; Hennessy</li>
+        </ul>
+      </div>
+      <div class="footer-meta">
+        <p>
+          <a href="mailto:naydin@itu.edu.tr">naydin@itu.edu.tr</a> &middot;
+          <a href="http://web.itu.edu.tr/naydin" target="_blank" rel="noopener noreferrer">web.itu.edu.tr/naydin</a>
+        </p>
+        <small>Hazırlayan: YUSUF ZER TUNCER</small>
+      </div>
+    </footer>
+
+    <!-- Onboarding Modal -->
+    <div id="onboarding" class="modal" role="dialog" aria-modal="true" aria-labelledby="onboarding-title" hidden>
+      <div class="modal-content">
+        <header>
+          <h2 id="onboarding-title">Simülasyona Hoş Geldin</h2>
+        </header>
+        <ol id="onboarding-steps">
+          <li>Bileşenlerin üzerine gelerek kısa ipuçlarını, tıklayarak detayları gör.</li>
+          <li>Kontrol çubuğundan akışı başlat ya da adım adım ilerle.</li>
+          <li>Bilgi katmanları ve zaman çizelgesinden kavramsal derinlik kazan.</li>
+        </ol>
+        <footer>
+          <label>
+            <input type="checkbox" id="onboarding-hide" />
+            Bir daha gösterme
+          </label>
+          <button id="onboarding-close" class="cta">Anladım</button>
+        </footer>
+      </div>
+    </div>
+  </body>
+</html>
+
