@@ -2544,6 +2544,12 @@ DAT 005    Limit value`
     // Initialize memory cells
     initializeMemoryCells();
 
+    // Prevent simulation keyboard shortcuts when typing in code editor
+    codeEditor.addEventListener("keydown", (event) => {
+      // Allow all keys to work normally in the editor
+      event.stopPropagation();
+    });
+
     // Update line numbers on input
     codeEditor.addEventListener("input", updateLineNumbers);
     codeEditor.addEventListener("scroll", () => {
